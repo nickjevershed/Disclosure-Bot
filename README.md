@@ -7,6 +7,6 @@ However after this initial coverage there is little scrutiny of donations aside 
 
 It’s a similar story with the register of pecuniary interests, where members of parliament and senators are required to disclose gifts, positions in companies, investments, and other things. There’s a flurry of interest when the register is added for each new parliament, and then little is looked at.
 
-This is why we have created a program that checks for donation amendments and updates to the register of interests every day.
+This is why I have created a program that checks for donation amendments and updates to the register of interests every day.
 
 At the moment updates are published to [@AusDisclosure](https://twitter.com/ausdisclosure).
