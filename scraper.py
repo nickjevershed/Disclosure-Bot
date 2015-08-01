@@ -283,28 +283,51 @@ def twitterBot():
     queryString = "* from interestsUpdateTable where dateScraped='" + dateScraped + "'"
     queryResult = scraperwiki.sqlite.select(queryString)
 
-    #print queryResult
+    #tweet the interests results
 
-    for result in queryResult:
-        
-        newTweet = result['politicianName'] + " has updated their interests register" + ". " + result['interestsUrl']
-        print "Tweeting: " + newTweet
-        twitter.update_status(status=newTweet)
-        time.sleep(60)
+    try:
+        if queryResult:
+            for result in queryResult:
+                newTweet = result['politicianName'] + " has updated their interests register" + ". " + result['interestsUrl']
+                print "Tweeting: " + newTweet
+                twitter.update_status(status=newTweet)
+                time.sleep(60)
+        if not queryResult:
+            print "No interests results, tweeting update"
+            twitter.update_status(status="Pecuniary interests register checked. No updates!")
+            time.sleep(60)
+                    
+    except Exception, e:
+        print str(e)
 
+    #tweet the donations results            
 
+    print scraperwiki.sqlite.show_tables()
     queryString = "* from donationUpdateTable where dateScraped='" + dateScraped + "'"
     
-    try:           
+    if "donationUpdateTable" in scraperwiki.sqlite.show_tables():
         queryResult = scraperwiki.sqlite.select(queryString)
-        for result in queryResult:
-            newTweet = result['partyName'] + " has amended their donation declarations for " + result['year'] + ". " + result['returnUrl']
-            print "Tweeting: " + newTweet
-            twitter.update_status(status=newTweet)
-            time.sleep(60)
-    except Exception, e:
-        print str(e)    
+        if queryResult:
+            for result in queryResult:
+                newTweet = result['partyName'] + " has amended their donation declarations for " + result['year'] + ". " + result['returnUrl']
+                print "Tweeting: " + newTweet
+                twitter.update_status(status=newTweet)
+                time.sleep(60)
+        if not queryResult:
+            print "No donations results, tweeting update"
+            twitter.update_status(status="Donation declarations checked. No updates!")
+            time.sleep(60)           
+    else:
+        print "No donations results, tweeting update"
+        twitter.update_status(status="Donation declarations checked. No updates!")
+        time.sleep(60)    
+
+  
 
 scrapeInterests()
 scrapeDonations()
 twitterBot()
+
+
+
+
