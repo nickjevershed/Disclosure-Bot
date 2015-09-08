@@ -254,7 +254,7 @@ def scrapeInterests():
 
                         #it has been updated, so save the new values in the main database table
 
-                        print data['politicianName'], " has updated their interests register"
+                        print data['politicianName'], " has updated the interests register"
 
                         scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
@@ -288,7 +288,7 @@ def twitterBot():
     try:
         if queryResult:
             for result in queryResult:
-                newTweet = result['politicianName'] + " has updated their interests register" + ". " + result['interestsUrl']
+                newTweet = result['politicianName'] + " has updated the interests register" + ". " + result['interestsUrl']
                 print "Tweeting: " + newTweet
                 twitter.update_status(status=newTweet)
                 time.sleep(60)
@@ -309,7 +309,7 @@ def twitterBot():
         queryResult = scraperwiki.sqlite.select(queryString)
         if queryResult:
             for result in queryResult:
-                newTweet = result['partyName'] + " has amended their donation declarations for " + result['year'] + ". " + result['returnUrl']
+                newTweet = result['partyName'] + " has amended donation declarations for " + result['year'] + ". " + result['returnUrl']
                 print "Tweeting: " + newTweet
                 twitter.update_status(status=newTweet)
                 time.sleep(60)
@@ -322,7 +322,6 @@ def twitterBot():
         twitter.update_status(status="Donation declarations checked. No updates!")
         time.sleep(60)    
 
-  
 
 scrapeInterests()
 scrapeDonations()
