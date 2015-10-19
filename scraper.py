@@ -123,6 +123,8 @@ def scrapeDonations():
                 else:
                     if data['dateFiled'] != queryResult[0]['dateFiled']:
 
+                        print "old date",data['dateFiled'],"new date",queryResult[0]['dateFiled']
+
                         #it has been updated, so save the new values in the main database table
 
                         print data['partyName'], "has filed an update for", data['year']
