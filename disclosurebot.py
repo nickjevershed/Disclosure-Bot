@@ -5,14 +5,14 @@ from twython import Twython, TwythonError
 import time
 from datetime import datetime
 import os
-import donupdates
+import donations
 import interests
 
 dateScraped = datetime.strftime(datetime.now(), '%Y-%m-%d')
 
 #Check donations updates
 
-donupdates.scrapeDonations()
+donations.scrapeDonations()
  
 #Check interests updates
 
