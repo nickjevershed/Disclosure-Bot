@@ -12,134 +12,12 @@ from twython import Twython, TwythonError
 import time
 from datetime import datetime
 import os
-
+import donupdates
 
 dateScraped = datetime.strftime(datetime.now(), '%Y-%m-%d')
 
-def scrapeDonations():
- 
-    annDonorsurl = "http://periodicdisclosures.aec.gov.au/Party.aspx"
-    scraperwiki.sqlite.save_var('startTime', datetime.now())
 
-    periods = [
-    {"year":"1998-1999","id":"1"},
-    {"year":"1999-2000","id":"2"},
-    {"year":"2000-2001","id":"3"},
-    {"year":"2001-2002","id":"4"},
-    {"year":"2002-2003","id":"5"},
-    {"year":"2003-2004","id":"6"},
-    {"year":"2004-2005","id":"7"},
-    {"year":"2005-2006","id":"8"},
-    {"year":"2006-2007","id":"9"},
-    {"year":"2007-2008","id":"10"},
-    {"year":"2008-2009","id":"23"},
-    {"year":"2009-2010","id":"24"},
-    {"year":"2010-2011","id":"48"},
-    {"year":"2011-2012","id":"49"},
-    {"year":"2012-2013","id":"51"},
-    {"year":"2013-2014","id":"55"}
-    ]
-
-    for period in periods:
-        br = mechanize.Browser()
-        br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
-        response = br.open(annDonorsurl)
-        print "Loading data for "+period['year']
-        year = period['year']
-        #for form in br.forms():
-            #print form
-
-        #print br.forms()    
-
-        #print "All forms:", [ form.name  for form in br.forms() ]
-     
-        br.select_form(nr=0)
-
-        # print br.form
-        # print periods[x]['id']
-        
-        br['ctl00$dropDownListPeriod']=[period['id']]
-        response = br.submit("ctl00$buttonGo")
-
-        response = br.open(annDonorsurl)
-        br.select_form(nr=0)
-        #print br.form.controls
-        items = br.form.controls[10].get_items()
-
-        for item in items:
-            partyID = item.name
-            print partyID
-            partyName = item.attrs['label']
-            print "Entity:", item.attrs['label']
-            response = br.open(annDonorsurl)
-            br.select_form(nr=0)
-            br['ctl00$ContentPlaceHolderBody$dropDownListParties']=[item.name]
-            br.select_form(nr=0)
-            response = br.submit("ctl00$ContentPlaceHolderBody$buttonSearch")
-            html = response.read()  
-            #print html
-            root = lxml.html.fromstring(html)
-            trs = root.cssselect("#ContentPlaceHolderBody_gridViewCurrent tr")
-            if trs:
-                tds = trs[-1].cssselect("td")
-                dateFiled = tds[1].text
-                #print "dateFiled", dateFiled
-                returnUrl = "http://periodicdisclosures.aec.gov.au/" + lxml.html.tostring(tds[0]).split('<a href="')[1].split('">')[0]
-                #print "returnUrl", returnUrl
-
-            data = {}
-            data['partyID'] = partyID
-            data['year'] = year
-            data['partyName'] = partyName
-            data['dateFiled'] = dateFiled
-            data['returnUrl'] = returnUrl
-            data['dateScraped'] = dateScraped
-
-            #print data
-            
-            #if running for the first time set firstRun to true
-
-            firstRun = False
-
-            if firstRun == True:
-                scraperwiki.sqlite.save(unique_keys=["partyID","partyName","year"], table_name="donationTable", data=data)
-
-            elif firstRun == False:
-                #check if it has been scraped before
-
-                queryString = "* from donationTable where partyID='" + partyID + "' and year='" + year + "'"
-                queryResult = scraperwiki.sqlite.select(queryString)
-                
-                #if it hasn't been scraped before, save the values
-
-                #scraperwiki.sqlite.save(unique_keys=["partyID","partyName","year"], table_name="donationTable", data=data)
-
-                if not queryResult:
-                    print "new data, saving"
-                    scraperwiki.sqlite.save(unique_keys=["partyID","partyName","year"], table_name="donationTable", data=data)
-
-                #if it has been saved before, check if it has been updated
-                
-                else:
-                    if data['dateFiled'] != queryResult[0]['dateFiled']:
-
-                        print "old date",data['dateFiled'],"new date",queryResult[0]['dateFiled']
-
-                        #it has been updated, so save the new values in the main database table
-
-                        print data['partyName'], "has filed an update for", data['year']
-
-                        scraperwiki.sqlite.save(unique_keys=["partyID","partyName","year"], table_name="donationTable", data=data)
-
-                        #and save the update details in the update table
-
-                        scraperwiki.sqlite.save(unique_keys=["partyID","partyName","year","dateFiled"], table_name="donationUpdateTable", data=data)
-                    else:
-                        print "no updates"
-
-        print "Completed "+period['year']
-                        
-    scraperwiki.sqlite.save_var('endTime', datetime.now())
+donupdates.scrapeDonations()
                         
 #end scrapeDonations
 
@@ -329,9 +207,9 @@ def twitterBot():
         time.sleep(60)    
 
 
-scrapeInterests()
-scrapeDonations()
-twitterBot()
+#scrapeInterests()
+#scrapeDonations()
+#twitterBot()
 
 
 
