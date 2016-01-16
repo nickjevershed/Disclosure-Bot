@@ -160,7 +160,7 @@ def scrapeInterests():
             dateUpdated = tds[0].text
             #print dateUpdated
             interestsUrl = "http://www.aph.gov.au/" + urllib.quote(tds[2].cssselect("a")[0].attrib['href'])
-            #print interestsUrl
+            print interestsUrl
             politicianName = tds[1].text.split(",")[1].strip() + " " + tds[1].text.split(",")[0].strip()
             #print politicianName
 
@@ -210,7 +210,7 @@ def scrapeInterests():
     for td in tds:
         if td.cssselect("ul"):
             interestsUrl = "http://www.aph.gov.au" + td.cssselect("a")[0].attrib['href']
-            #print interestsUrl
+            print interestsUrl
             
             politicianName = td.cssselect("a")[0].text.split(",")[1].replace("Senator","").strip() + " " + td.cssselect("a")[0].text.split(",")[0].strip()
             #print politicianName
@@ -218,8 +218,12 @@ def scrapeInterests():
             if politicianName.encode("utf-8") == "James  –  for Queensland McGrath":
                 politicianName = "James McGrath"
                 print "fixed James"
-            dateUpdated = lxml.html.tostring(td.cssselect("li")[0]).split("Last updated")[1].replace("&#160;"," ").replace("<em>","").replace("</em>","").replace("</li>","").strip()
             
+            try:
+                dateUpdated = lxml.html.tostring(td.cssselect("li")[0]).split("Last updated")[1].replace("&#160;"," ").replace("<em>","").replace("</em>","").replace("</li>","").strip()
+            except:
+                dateUpdated = lxml.html.tostring(td.cssselect("em")[0]).split("Last updated")[1].replace("&#160;"," ").replace("<em>","").replace("</em>","").replace("</li>","").strip()
+
             dateUpdated.split()
             
             #print dateUpdated
@@ -241,8 +245,8 @@ def scrapeInterests():
             elif firstRun == False:
                 queryString = "* from interestsTable where politicianName='" + politicianName.replace("'","''") + "'"
                 queryResult = scraperwiki.sqlite.select(queryString)
-                print queryResult
-                print data    
+                #print queryResult
+                #print data    
                 #if it hasn't been scraped before, save the values
 
                 if not queryResult:
@@ -256,7 +260,7 @@ def scrapeInterests():
 
                         #it has been updated, so save the new values in the main database table
 
-                        print data['politicianName'], " has updated the interests register"
+                        print data['politicianName'].encode('ascii', 'ignore'), " has updated the interests register"
 
                         scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
