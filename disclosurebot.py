@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 import donations
 import interests
+import scraperwiki
 
 dateScraped = datetime.strftime(datetime.now(), '%Y-%m-%d')
 
@@ -41,11 +42,11 @@ def twitterBot():
             for result in queryResult:
                 newTweet = result['politicianName'] + " has updated the interests register" + ". " + result['interestsUrl']
                 print "Tweeting: " + newTweet
-                twitter.update_status(status=newTweet)
+                #twitter.update_status(status=newTweet)
                 time.sleep(60)
         if not queryResult:
             print "No interests results, tweeting update"
-            twitter.update_status(status="Pecuniary interests register checked. No updates!")
+            #twitter.update_status(status="Pecuniary interests register checked. No updates!")
             time.sleep(60)
                     
     except Exception, e:
@@ -53,7 +54,7 @@ def twitterBot():
 
     #tweet the donations results            
 
-    print scraperwiki.sqlite.show_tables()
+    #print scraperwiki.sqlite.show_tables()
 
     queryString = "* from donationUpdateTable where dateScraped='" + dateScraped + "'"
     
@@ -63,18 +64,18 @@ def twitterBot():
             for result in queryResult:
                 newTweet = result['entityName'] + " has updated donation declarations for " + result['year'] + ". " + result['returnUrl']
                 print "Tweeting: " + newTweet
-                twitter.update_status(status=newTweet)
+                #twitter.update_status(status=newTweet)
                 time.sleep(60)
         if not queryResult:
             print "No donations results, tweeting update"
-            twitter.update_status(status="Donation declarations checked. No updates!")
+            #twitter.update_status(status="Donation declarations checked. No updates!")
             time.sleep(60)           
     else:
         print "No donations results, tweeting update"
-        twitter.update_status(status="Donation declarations checked. No updates!")
+        #twitter.update_status(status="Donation declarations checked. No updates!")
         time.sleep(60)    
 
-#twitterBot()
+twitterBot()
 
 
 
