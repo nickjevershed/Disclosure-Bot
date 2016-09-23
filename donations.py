@@ -27,7 +27,8 @@ def scrapeDonations():
     {"year":"2010-2011","id":"48"},
     {"year":"2011-2012","id":"49"},
     {"year":"2012-2013","id":"51"},
-    {"year":"2013-2014","id":"55"}
+    {"year":"2013-2014","id":"55"},
+    {"year":"2014-2015","id":"56"}
     ]
 
     for period in periods:
@@ -71,6 +72,7 @@ def scrapeDonations():
             tds = tr.cssselect("td")
             dateFiled = tds[0].text
             entityName = tds[1].cssselect("a")[0].text
+            print entityName
             entityID = tds[1].cssselect("a")[0].attrib['href'].split("&ClientId=")[1]
             returnUrl = "http://periodicdisclosures.aec.gov.au/" + tds[2].cssselect("a")[0].attrib['href']
             returnText = tds[2].cssselect("a")[0].text
@@ -92,7 +94,6 @@ def scrapeDonations():
             data['entityType'] = returnType
             data['returnText'] = returnText
 
-            print data
             
             #if running for the first time set firstRun to true
 
@@ -106,11 +107,11 @@ def scrapeDonations():
 
                 queryString = "* from donationTable where entityID='" + entityID + "' and year='" + year + "' and returnText='" + returnText + "'"
                 queryResult = scraperwiki.sqlite.select(queryString)
-                print queryResult
+                #print queryResult
                 #if it hasn't been scraped before, save the values in the main table and table for tweeting
 
                 if not queryResult:
-                    print data['partyName'], "has filed an update for", data['year']
+                    print data['entityName'], "has filed an update for", data['year']
                     scraperwiki.sqlite.save(unique_keys=["entityID","entityName","returnText","year"], table_name="donationTable", data=data)
                     scraperwiki.sqlite.save(unique_keys=["entityID","entityName","returnText","year","dateFiled"], table_name="donationUpdateTable", data=data)
                 
