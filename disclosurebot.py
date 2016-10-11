@@ -37,7 +37,7 @@ def twitterBot():
     queryString = "* from interestsUpdateTable where dateScraped='" + dateScraped + "'"
     queryResult = scraperwiki.sqlite.select(queryString)
 
-    #tweet the interests results
+    # #tweet the interests results
 
     try:
         if queryResult:
@@ -86,6 +86,7 @@ def twitterBot():
             time.sleep(60)    
         except Exception, e:
             print str(e)    
+
 twitterBot()
 
 
