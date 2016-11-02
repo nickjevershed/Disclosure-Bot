@@ -7,6 +7,7 @@ import urllib
 import lxml.html
 from datetime import datetime
 
+testing = False
 
 def cleanNames(name):
     titles = ['The Hon ','Mr ','Mrs ','Dr ', ' OAM','Ms ', ' AO', ' AM','The  Hon ','the Hon ']
@@ -52,7 +53,8 @@ def scrapeInterests():
                 #print data
 
                 if firstRun == True:
-                    scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
+                    if not testing:
+                        scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
                 elif firstRun == False:
                     queryString = "* from interestsTable where politicianName='" + politicianName.replace("'","''") + "'"
@@ -62,7 +64,8 @@ def scrapeInterests():
 
                     if not queryResult:
                         print "new data, saving"
-                        scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
+                        if not testing:
+                            scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
                     #if it has been saved before, check if it has been updated
                     
@@ -72,12 +75,13 @@ def scrapeInterests():
                             #it has been updated, so save the new values in the main database table
 
                             print data['politicianName'], " has amended their interests register"
-
-                            scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
+                            if not testing:
+                                scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
                             #and save the update details in the update table
 
-                            scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl","dateUpdated"], table_name="interestsUpdateTable", data=data)
+                            if not testing:
+                                scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl","dateUpdated"], table_name="interestsUpdateTable", data=data)
 
     print "Members interests complete"
                         
@@ -88,7 +92,7 @@ def scrapeInterests():
     
     for td in tds:
         if td.cssselect("ul"):
-            interestsUrl = "http://www.aph.gov.au" + td.cssselect("a")[0].attrib['href']
+            interestsUrl = "http://www.aph.gov.au" + urllib.quote(td.cssselect("a")[0].attrib['href'].replace("?la=en",""))
             print interestsUrl
             
             politicianName = td.cssselect("a")[0].text.split(",")[1].replace("Senator","").strip() + " " + td.cssselect("a")[0].text.split(",")[0].strip()
@@ -131,7 +135,8 @@ def scrapeInterests():
 
                 if not queryResult:
                     print "new data, saving"
-                    scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
+                    if testing:
+                        scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
                 #if it has been saved before, check if it has been updated
                 
@@ -141,14 +146,17 @@ def scrapeInterests():
                         #it has been updated, so save the new values in the main database table
 
                         print data['politicianName'].encode('ascii', 'ignore'), " has updated the interests register"
-
-                        scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
+                        if not testing:
+                            scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
                         #and save the update details in the update table
-
-                        scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl","dateUpdated"], table_name="interestsUpdateTable", data=data)
+                        if not testing:
+                            scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl","dateUpdated"], table_name="interestsUpdateTable", data=data)
 
                     else:
                         print "no updates"                         
     
     print "Senators interests complete"
+
+if testing:
+    scrapeInterests()
