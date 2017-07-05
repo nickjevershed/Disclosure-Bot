@@ -11,29 +11,24 @@ def scrapeDonations():
     annDonorsurl = "http://periodicdisclosures.aec.gov.au/Updates.aspx"
     scraperwiki.sqlite.save_var('startTime', datetime.now())
 
-    periods = [
-    {"year":"1998-1999","id":"1"},
-    {"year":"1999-2000","id":"2"},
-    {"year":"2000-2001","id":"3"},
-    {"year":"2001-2002","id":"4"},
-    {"year":"2002-2003","id":"5"},
-    {"year":"2003-2004","id":"6"},
-    {"year":"2004-2005","id":"7"},
-    {"year":"2005-2006","id":"8"},
-    {"year":"2006-2007","id":"9"},
-    {"year":"2007-2008","id":"10"},
-    {"year":"2008-2009","id":"23"},
-    {"year":"2009-2010","id":"24"},
-    {"year":"2010-2011","id":"48"},
-    {"year":"2011-2012","id":"49"},
-    {"year":"2012-2013","id":"51"},
-    {"year":"2013-2014","id":"55"},
-    {"year":"2014-2015","id":"56"}
-    ]
+    br = mechanize.Browser()
+    br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
+
+    response = br.open(annDonorsurl)
+    br.select_form(nr=0)
+    html = response.read()
+    root = lxml.html.fromstring(html)
+    formOptions = root.cssselect('#dropDownListPeriod option')
+
+    periods = []
+    for option in formOptions:
+        year = option.text
+        if len(option.text) == 7:
+            year = option.text.split("-")[0] + "-20" + option.text.split("-")[1]
+        periods.append({"year":year, "id":option.attrib['value']})
+    print periods
 
     for period in periods:
-        br = mechanize.Browser()
-        br.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.1) Gecko/2008071615 Fedora/3.0.1-1.fc9 Firefox/3.0.1')]
         response = br.open(annDonorsurl)
         print "Loading data for "+period['year']
         year = period['year']
@@ -74,8 +69,16 @@ def scrapeDonations():
             entityName = tds[1].cssselect("a")[0].text
             print entityName
             entityID = tds[1].cssselect("a")[0].attrib['href'].split("&ClientId=")[1]
-            returnUrl = "http://periodicdisclosures.aec.gov.au/" + tds[2].cssselect("a")[0].attrib['href']
-            returnText = tds[2].cssselect("a")[0].text
+            
+            
+            print lxml.html.tostring(tds[2])
+            if "<a href" in lxml.html.tostring(tds[2]):
+                returnUrl = "http://periodicdisclosures.aec.gov.au/" + tds[2].cssselect("a")[0].attrib['href']                    
+                returnText = tds[2].cssselect("a")[0].text
+            else:
+                returnUrl = ""
+                returnText = tds[2].text    
+
             returnType = ""
             if "Original" in returnText:
                 returnType = 'original'
@@ -91,10 +94,9 @@ def scrapeDonations():
             data['returnUrl'] = returnUrl
             data['dateScraped'] = dateScraped
             data['returnType'] = returnType
-            data['entityType'] = returnType
+            data['entityType'] = entityType
             data['returnText'] = returnText
 
-            
             #if running for the first time set firstRun to true
 
             firstRun = False
@@ -105,7 +107,7 @@ def scrapeDonations():
             elif firstRun == False:
                 #check if it has been scraped before
 
-                queryString = "* from donationTable where entityID='" + entityID + "' and year='" + year + "' and returnText='" + returnText + "'"
+                queryString = "* from donationTable where entityID='" + entityID + "' and year='" + year + "' and dateFiled='" + dateFiled + "'"
                 queryResult = scraperwiki.sqlite.select(queryString)
                 #print queryResult
                 #if it hasn't been scraped before, save the values in the main table and table for tweeting

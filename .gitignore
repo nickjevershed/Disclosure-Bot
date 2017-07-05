@@ -1,0 +1,5 @@
+# Folders
+/graphics/
+
+# Compiled python modules.
+*.pyc
