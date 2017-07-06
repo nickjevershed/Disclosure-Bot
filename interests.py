@@ -57,7 +57,7 @@ def scrapeInterests():
                         scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
                 elif firstRun == False:
-                    queryString = "* from interestsTable where politicianName='" + politicianName.replace("'","''") + "'"
+                    queryString = "* from interestsTable where politicianName='{name}'".format(name=politicianName.replace("'","''"))
                     queryResult = scraperwiki.sqlite.select(queryString)
 
                     #if it hasn't been scraped before, save the values
@@ -72,13 +72,13 @@ def scrapeInterests():
                     else:
                         if data['dateUpdated'] != queryResult[0]['dateUpdated']:
 
-                            #it has been updated, so save the new values in the main database table
+                            # it has been updated, so save the new values in the main database table
 
                             print data['politicianName'], " has amended their interests register"
                             if not testing:
                                 scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
-                            #and save the update details in the update table
+                            # and save the update details in the update table
 
                             if not testing:
                                 scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl","dateUpdated"], table_name="interestsUpdateTable", data=data)
@@ -96,7 +96,7 @@ def scrapeInterests():
             print interestsUrl
             
             politicianName = td.cssselect("a")[0].text.split(",")[1].replace("Senator","").strip() + " " + td.cssselect("a")[0].text.split(",")[0].strip()
-            politicianName = cleanNames(politicianName)
+            politicianName = cleanNames(politicianName).encode("utf-8")
             #print politicianName
 
             # if politicianName.encode("utf-8") == "James  –  for Queensland McGrath":
@@ -127,7 +127,8 @@ def scrapeInterests():
                 scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
             elif firstRun == False:
-                queryString = "* from interestsTable where politicianName='" + politicianName.replace("'","''") + "'"
+                print politicianName
+                queryString = "* from interestsTable where politicianName='{name}'".format(name=politicianName.replace("'","''"))
                 queryResult = scraperwiki.sqlite.select(queryString)
                 #print queryResult
                 #print data    
@@ -135,7 +136,7 @@ def scrapeInterests():
 
                 if not queryResult:
                     print "new data, saving"
-                    if testing:
+                    if not testing:
                         scraperwiki.sqlite.save(unique_keys=["politicianName","interestsUrl"], table_name="interestsTable", data=data)
 
                 #if it has been saved before, check if it has been updated
@@ -159,4 +160,4 @@ def scrapeInterests():
     print "Senators interests complete"
 
 if testing:
-    scrapeInterests()
+    scrapeInterests()   

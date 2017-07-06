@@ -10,7 +10,7 @@ import interests
 import scraperwiki
 
 dateScraped = datetime.strftime(datetime.now(), '%Y-%m-%d')
-
+testing = True
 print "dateScraped", dateScraped 
 
 #Check donations updates
@@ -44,12 +44,14 @@ def twitterBot():
             for result in queryResult:
                 newTweet = result['politicianName'] + " has updated the interests register" + ". " + result['interestsUrl']
                 print "Tweeting: " + newTweet
-                twitter.update_status(status=newTweet)
+                if not testing:
+                    twitter.update_status(status=newTweet)
                 time.sleep(60)
         if not queryResult:
             print "No interests results, tweeting update"
-            twitter.update_status(status="Pecuniary interests register checked. No updates!")
-            time.sleep(60)
+            if not testing:
+                twitter.update_status(status="Pecuniary interests register checked. No updates!")
+                time.sleep(60)
                     
     except Exception, e:
         print str(e)
@@ -67,23 +69,26 @@ def twitterBot():
                 newTweet = result['entityName'] + " has updated donation declarations for " + result['year'] + ": " + result['returnUrl']
                 print "Tweeting: " + newTweet
                 try:
-                    twitter.update_status(status=newTweet)
-                    time.sleep(60)
+                    if not testing:    
+                        twitter.update_status(status=newTweet)
+                        time.sleep(60)
                 except Exception, e:
                     print str(e)
                     
         if not queryResult:
             print "No donations results, tweeting update"
             try:
-                twitter.update_status(status="Donation declarations checked. No updates!")
-                time.sleep(60)
+                if not testing:    
+                    twitter.update_status(status="Donation declarations checked. No updates!")
+                    time.sleep(60)
             except Exception, e:
                 print str(e)          
     else:
         print "No donations results, tweeting update"
         try:
-            twitter.update_status(status="Donation declarations checked. No updates!")
-            time.sleep(60)    
+            if not testing:
+                twitter.update_status(status="Donation declarations checked. No updates!")
+                time.sleep(60)    
         except Exception, e:
             print str(e)    
 
