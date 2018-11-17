@@ -92,8 +92,5 @@ def twitterBot():
         except Exception, e:
             print str(e)    
 
+
 twitterBot()
-
-
-
-
