@@ -1,5 +1,12 @@
 # Folders
+
 /graphics/
 /db-backups/
+
 # Compiled python modules.
+
 *.pyc
+
+# database
+
+*.sqlite
