@@ -26,6 +26,7 @@ def scrapeDonations():
         if len(option.text) == 7:
             year = option.text.split("-")[0] + "-20" + option.text.split("-")[1]
         periods.append({"year":year, "id":option.attrib['value']})
+    
     print periods
 
     for period in periods:

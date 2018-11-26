@@ -17,9 +17,9 @@ print "dateScraped", dateScraped
 
 donations.scrapeDonations()
  
-#Check interests updates
+# Check interests updates
 
-interests.scrapeInterests()
+# interests.scrapeInterests()
   
 #twitterbot http://geekswipe.net/2014/10/code-python-twitter-bot-in-ten-minutes/
 
@@ -34,31 +34,31 @@ def twitterBot():
 
     #check the database for today's updates entries and tweet them
 
-    queryString = "* from interestsUpdateTable where dateScraped='" + dateScraped + "'"
-    queryResult = scraperwiki.sqlite.select(queryString)
+    # queryString = "* from interestsUpdateTable where dateScraped='" + dateScraped + "'"
+    # queryResult = scraperwiki.sqlite.select(queryString)
 
     # #tweet the interests results
 
-    try:
-        if queryResult:
-            for result in queryResult:
-                newTweet = result['politicianName'] + " has updated the interests register" + ". " + result['interestsUrl']
-                print "Tweeting: " + newTweet
-                if not testing:
-                    twitter.update_status(status=newTweet)
-                time.sleep(60)
-        if not queryResult:
-            print "No interests results, tweeting update"
-            if not testing:
-                twitter.update_status(status="Pecuniary interests register checked. No updates!")
-                time.sleep(60)
+    # try:
+    #     if queryResult:
+    #         for result in queryResult:
+    #             newTweet = result['politicianName'] + " has updated the interests register" + ". " + result['interestsUrl']
+    #             print "Tweeting: " + newTweet
+    #             if not testing:
+    #                 twitter.update_status(status=newTweet)
+    #             time.sleep(60)
+    #     if not queryResult:
+    #         print "No interests results, tweeting update"
+    #         if not testing:
+    #             twitter.update_status(status="Pecuniary interests register checked. No updates!")
+    #             time.sleep(60)
                     
-    except Exception, e:
-        print str(e)
+    # except Exception, e:
+    #     print str(e)
 
     #tweet the donations results            
 
-    #print scraperwiki.sqlite.show_tables()
+    # print scraperwiki.sqlite.show_tables()
 
     queryString = "* from donationUpdateTable where dateScraped='" + dateScraped + "'"
     
