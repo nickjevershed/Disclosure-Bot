@@ -10,7 +10,7 @@ import interests
 import scraperwiki
 
 dateScraped = datetime.strftime(datetime.now(), '%Y-%m-%d')
-testing = True
+testing = False
 print "dateScraped", dateScraped 
 
 #Check donations updates
